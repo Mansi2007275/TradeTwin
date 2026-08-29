@@ -1,0 +1,42 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_24-bff00d39b30e5b3da5bea247faf29c6470814919",
+  "solcVersion": "0.8.24",
+  "solcLongVersion": "0.8.24+commit.e11b9ed9",
+  "compilerType": "solc",
+  "userSourceNameMap": {
+    "contracts/TradeTwinRegistry.sol": "project/contracts/TradeTwinRegistry.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "shanghai",
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/TradeTwinRegistry.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.24;\n\n/// @title TradeTwinRegistry — on-chain proof of twin registration, simulations, and achievements\ncontract TradeTwinRegistry {\n    struct TwinRegistration {\n        bytes32 twinHash;\n        uint64 tradeCount;\n        uint64 registeredAt;\n        bool exists;\n    }\n\n    struct SimulationResult {\n        int32 userReturnBps;\n        int32 twinReturnBps;\n        uint8 winner;\n        uint8 rounds;\n        uint64 recordedAt;\n    }\n\n    mapping(address => TwinRegistration) public twins;\n    mapping(address => SimulationResult[]) private _simulations;\n    mapping(address => mapping(bytes32 => bool)) public achievements;\n\n    event TwinRegistered(address indexed trader, bytes32 twinHash, uint256 tradeCount);\n    event SimulationRecorded(\n        address indexed trader,\n        int32 userReturnBps,\n        int32 twinReturnBps,\n        uint8 winner\n    );\n    event AchievementRecorded(address indexed trader, bytes32 achievementId);\n\n    function registerTwin(bytes32 twinHash, uint256 tradeCount) external {\n        twins[msg.sender] = TwinRegistration({\n            twinHash: twinHash,\n            tradeCount: uint64(tradeCount),\n            registeredAt: uint64(block.timestamp),\n            exists: true\n        });\n        emit TwinRegistered(msg.sender, twinHash, tradeCount);\n    }\n\n    function recordSimulation(\n        int32 userReturnBps,\n        int32 twinReturnBps,\n        uint8 winner,\n        uint8 rounds\n    ) external {\n        _simulations[msg.sender].push(\n            SimulationResult({\n                userReturnBps: userReturnBps,\n                twinReturnBps: twinReturnBps,\n                winner: winner,\n                rounds: rounds,\n                recordedAt: uint64(block.timestamp)\n            })\n        );\n        emit SimulationRecorded(msg.sender, userReturnBps, twinReturnBps, winner);\n    }\n\n    function recordAchievement(bytes32 achievementId) external {\n        require(!achievements[msg.sender][achievementId], \"Achievement already recorded\");\n        achievements[msg.sender][achievementId] = true;\n        emit AchievementRecorded(msg.sender, achievementId);\n    }\n\n    function getSimulationCount(address trader) external view returns (uint256) {\n        return _simulations[trader].length;\n    }\n\n    function hasAchievement(address trader, bytes32 achievementId) external view returns (bool) {\n        return achievements[trader][achievementId];\n    }\n}\n"
+      }
+    }
+  }
+}
