@@ -7,6 +7,7 @@ import { ExpectedWalletPrompt } from "@/components/wallet/ExpectedWalletPrompt";
 import { WalletConnectEmptyState } from "@/components/wallet/WalletConnectEmptyState";
 import { DeployRegistryCard } from "@/components/onchain/DeployRegistryCard";
 import { DashboardWalletHero } from "@/components/dashboard/DashboardWalletHero";
+import { SetupStatusBanner } from "@/components/dashboard/SetupStatusBanner";
 import { DNAGlanceCard } from "@/components/dashboard/DNAGlanceCard";
 import { GradientStatCard } from "@/components/charts/GradientStatCard";
 import { Card } from "@/components/ui/Card";
@@ -70,6 +71,10 @@ export default function DashboardPage() {
       description="Your connected wallet and on-chain trading activity."
     >
       <div className="space-y-6">
+        <MotionItem>
+          <SetupStatusBanner />
+        </MotionItem>
+
         <MotionItem>
           <DashboardWalletHero
             address={address}

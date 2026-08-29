@@ -59,8 +59,13 @@ export function TwinDecisionPanel({ result }: { result: TwinDecisionResult }) {
           <span className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
             Twin Decision Model
           </span>
-          <Badge variant="info">{Math.round(result.confidence * 100)}% confidence</Badge>
           <Badge variant="default">{result.decision}</Badge>
+          <Badge variant="info">
+            {Math.round(result.decisionStrength * 100)}% decision strength
+          </Badge>
+          <Badge variant="warning">
+            {Math.round(result.dataConfidence * 100)}% data confidence
+          </Badge>
         </div>
 
         <div className="space-y-2">

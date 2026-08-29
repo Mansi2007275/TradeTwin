@@ -57,14 +57,13 @@ export async function fetchWalletTrades(address: string): Promise<WalletTradesRe
   const { cache } = await priceDataService.getHistoricalDailyPrices();
   const priceSource = cache.source;
 
-  const fetchers: Promise<{ transfers: RawTransfer[]; source: string }>[] = [
-    fetchTransfersFromAtlas(address),
-    fetchTransfersFromRpc(address),
-  ];
+  const fetchers: Promise<{ transfers: RawTransfer[]; source: string }>[] = [];
 
   if (hasMonadscanApiKey()) {
     fetchers.push(fetchTransfersFromMonadscan(address));
   }
+
+  fetchers.push(fetchTransfersFromAtlas(address), fetchTransfersFromRpc(address));
 
   const settled = await Promise.allSettled(fetchers);
 

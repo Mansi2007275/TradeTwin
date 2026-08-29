@@ -30,6 +30,9 @@ export function computeTwinDecision(
   state: SimulationState,
 ): TwinDecisionResult {
   const reasonCodes: TwinReasonCode[] = ["BASELINE_BEHAVIOUR"];
+  if (twin.lowDataMode) {
+    reasonCodes.push("INSUFFICIENT_HISTORY");
+  }
   const { weights, patterns, baselineProbabilities: base } = twin;
 
   let buyScore = Math.log(base.buy + 0.01);
@@ -101,8 +104,9 @@ export function computeTwinDecision(
 
   const probs = softmax([buyScore, holdScore, sellScore]);
   const decision = toDecision(probs);
-  const maxProb = Math.max(...probs);
-  const confidence = Math.round(maxProb * twin.confidence * 100) / 100;
+  const decisionStrength = Math.round(Math.max(...probs) * 1000) / 1000;
+  const dataConfidence = twin.confidence;
+  const confidence = Math.round(decisionStrength * dataConfidence * 1000) / 1000;
 
   const uniqueCodes = [...new Set(reasonCodes)];
 
@@ -111,6 +115,8 @@ export function computeTwinDecision(
     holdProbability: Math.round(probs[1] * 1000) / 1000,
     sellProbability: Math.round(probs[2] * 1000) / 1000,
     confidence,
+    decisionStrength,
+    dataConfidence,
     reasonCodes: uniqueCodes,
     decision,
     explanation: explainReasonCodes(uniqueCodes),

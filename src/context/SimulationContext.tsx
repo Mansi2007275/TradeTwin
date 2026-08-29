@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -34,6 +35,7 @@ import {
   saveSimulation,
 } from "@/lib/storage";
 import { useToast } from "@/context/ToastContext";
+import { useAnalysis } from "@/context/AnalysisContext";
 
 interface SimulationContextValue {
   session: SimulationSession | null;
@@ -52,6 +54,8 @@ const SimulationContext = createContext<SimulationContextValue | null>(null);
 
 export function SimulationProvider({ children }: { children: ReactNode }) {
   const { pushToast } = useToast();
+  const { twin } = useAnalysis();
+  const twinBuiltAtRef = useRef<string | null>(null);
   const [session, setSession] = useState<SimulationSession | null>(null);
   const [outcome, setOutcome] = useState<SimulationOutcome | null>(null);
   const [lastRecord, setLastRecord] = useState<RoundRecord | null>(null);
@@ -174,6 +178,14 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
     setLastTwinResult(null);
     clearStoredSimulation();
   }, []);
+
+  useEffect(() => {
+    if (!twin?.builtAt) return;
+    if (twinBuiltAtRef.current && twinBuiltAtRef.current !== twin.builtAt) {
+      resetSimulation();
+    }
+    twinBuiltAtRef.current = twin.builtAt;
+  }, [twin?.builtAt, resetSimulation]);
 
   const value = useMemo(
     () => ({

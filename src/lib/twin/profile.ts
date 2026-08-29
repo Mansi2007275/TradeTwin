@@ -46,7 +46,14 @@ function buildPatterns(
   };
 }
 
-function baselineProbabilities(patterns: TwinHistoricalPatterns) {
+function baselineProbabilities(
+  patterns: TwinHistoricalPatterns,
+  tradeCount: number,
+) {
+  if (tradeCount < 3) {
+    return { buy: 0.33, hold: 0.34, sell: 0.33 };
+  }
+
   const rawBuy = patterns.buyRate * 0.7 + patterns.buyAfterPumpRate * 0.3;
   const rawSell = patterns.sellRate * 0.7 + patterns.earlyExitRate * 0.3;
   const rawHold = patterns.holdTendency;
@@ -66,17 +73,20 @@ export function buildTwinProfile(
 ): TwinProfile {
   const patterns = buildPatterns(profile, trades);
   const weights = buildWeights(dna);
+  const tradeCount = profile.tradeCount;
+  const lowDataMode = tradeCount < 3;
 
   return {
     walletAddress: profile.walletAddress,
     version: TWIN_VERSION,
     builtAt: new Date().toISOString(),
     name: `Twin-${profile.walletAddress.slice(2, 6)}`,
-    baselineProbabilities: baselineProbabilities(patterns),
+    baselineProbabilities: baselineProbabilities(patterns, tradeCount),
     weights,
     patterns,
     confidence: dna.overallConfidence,
-    tradeCount: profile.tradeCount,
+    tradeCount,
+    lowDataMode,
   };
 }
 

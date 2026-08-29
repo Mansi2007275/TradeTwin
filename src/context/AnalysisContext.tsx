@@ -14,6 +14,7 @@ import type { BehaviourProfile } from "@/lib/analysis/types";
 import type { Trade } from "@/lib/analysis/types";
 import type { TradingDNA } from "@/lib/dna/types";
 import type { TwinProfile } from "@/lib/twin/types";
+import { normalizeTwinProfile } from "@/lib/twin/normalize";
 import {
   clearStoredAnalysis,
   loadAnalysis,
@@ -44,7 +45,7 @@ interface AnalysisContextValue extends AnalysisState {
 
 const AnalysisContext = createContext<AnalysisContextValue | null>(null);
 
-const ANALYZE_TIMEOUT_MS = 90_000;
+const ANALYZE_TIMEOUT_MS = 120_000;
 
 export function AnalysisProvider({ children }: { children: ReactNode }) {
   const { pushToast } = useToast();
@@ -72,7 +73,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
         ...s,
         profile: stored.profile,
         dna: stored.dna,
-        twin: stored.twin,
+        twin: normalizeTwinProfile(stored.twin),
         trades: stored.trades,
         lastAddress: stored.lastAddress,
         dataSource: stored.dataSource ?? null,
@@ -122,7 +123,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
             return {
               profile: data.profile as BehaviourProfile,
               dna: data.dna as TradingDNA,
-              twin: data.twin as TwinProfile,
+              twin: normalizeTwinProfile(data.twin as TwinProfile),
               trades: data.trades as Trade[],
               isLoading: false,
               error: null,
@@ -147,7 +148,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
           const next = {
             profile: data.profile as BehaviourProfile,
             dna: data.dna as TradingDNA,
-            twin: data.twin as TwinProfile,
+            twin: normalizeTwinProfile(data.twin as TwinProfile),
             trades: data.trades as Trade[],
             lastAddress: address,
             dataSource: (data.meta?.source as string | undefined) ?? null,

@@ -34,8 +34,11 @@ export interface TwinProfile {
   };
   weights: TwinWeights;
   patterns: TwinHistoricalPatterns;
+  /** Confidence in behavioural model (0–1), from DNA sample size. */
   confidence: number;
   tradeCount: number;
+  /** True when fewer than 3 on-chain trades — twin uses neutral baselines. */
+  lowDataMode: boolean;
 }
 
 export interface SimulationState {
@@ -55,7 +58,12 @@ export interface TwinDecisionResult {
   buyProbability: number;
   holdProbability: number;
   sellProbability: number;
+  /** Combined score used for on-chain registry (decision × data confidence). */
   confidence: number;
+  /** How strongly the model favours the chosen action (max probability). */
+  decisionStrength: number;
+  /** How much on-chain history backs the twin (0–1). */
+  dataConfidence: number;
   reasonCodes: string[];
   decision: TradeSide;
   explanation: string;
@@ -73,4 +81,5 @@ export type TwinReasonCode =
   | "AGGRESSIVE_SIZE_UP"
   | "HIGH_VOLATILITY_HOLD"
   | "TREND_CONTINUATION_HOLD"
-  | "NO_POSITION_WAIT";
+  | "NO_POSITION_WAIT"
+  | "INSUFFICIENT_HISTORY";

@@ -173,6 +173,20 @@ export default function SimulationPage() {
         <div className="space-y-6">
           <NetworkSwitchPrompt />
 
+          {twin.lowDataMode && (
+            <MotionItem>
+              <Card variant="ghost" padding="md" hover={false}>
+                <p className="text-sm text-[var(--warning)]">
+                  Limited on-chain history ({twin.tradeCount} transfers). Your Twin uses neutral
+                  baselines — add{" "}
+                  <code className="text-xs">MONADSCAN_API_KEY</code> to{" "}
+                  <code className="text-xs">.env</code>, re-analyze on Dashboard, then restart
+                  simulation for behaviour matched to your real trades.
+                </p>
+              </Card>
+            </MotionItem>
+          )}
+
           <MotionItem>
             <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-[var(--border-subtle)] bg-white px-4 py-3">
               <p className="font-data text-sm font-semibold text-[var(--text-display)]">

@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "compile:contracts": "hardhat compile",
-    "deploy:registry": "hardhat run scripts/deploy-registry.ts --network monadTestnet"
+    "deploy:registry": "hardhat run scripts/deploy-registry.ts --network monadTestnet",
+    "verify": "node scripts/verify-setup.mjs"
   },
   "dependencies": {
     "@metamask/connect-evm": "^2.1.1",

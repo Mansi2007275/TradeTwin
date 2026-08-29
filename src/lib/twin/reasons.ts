@@ -25,6 +25,8 @@ export const REASON_EXPLANATIONS: Record<TwinReasonCode, string> = {
     "Moderate uptrend with open position — twin holds through trend, matching your style.",
   NO_POSITION_WAIT:
     "No open position and weak signal — twin waits rather than forcing a trade.",
+  INSUFFICIENT_HISTORY:
+    "Fewer than 3 on-chain trades found — twin uses neutral baselines and DNA weights until you analyze more wallet activity.",
 };
 
 export function explainReasonCodes(codes: string[]): string {

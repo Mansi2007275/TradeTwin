@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { isAddress } from "viem";
 import { analyzeBehaviour } from "@/lib/analysis/engine";
 import { computeTradingDNA } from "@/lib/dna/engine";
-import { buildTwinProfile } from "@/lib/twin";
+import { buildTwinProfile, normalizeTwinProfile } from "@/lib/twin";
 import { fetchWalletTrades } from "@/lib/trades";
 import { fetchWalletBalance } from "@/lib/trades/fetch-rpc";
 
-export const maxDuration = 90;
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const monBalance = await fetchWalletBalance(address);
     const profile = analyzeBehaviour(trades, address, source);
     const dna = computeTradingDNA(profile);
-    const twin = buildTwinProfile(profile, dna, trades);
+    const twin = normalizeTwinProfile(buildTwinProfile(profile, dna, trades));
 
     return NextResponse.json({
       profile,

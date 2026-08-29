@@ -2,11 +2,11 @@ import { formatUnits } from "viem";
 import type { RawTransfer } from "@/lib/analysis/types";
 import { withTimeout } from "./fetch-utils";
 
-/** ~2 hours of Monad testnet history at ~3.3 blocks/sec (rate-limit safe). */
-const MAX_BLOCKS_TO_SCAN = 25_000;
-const RPC_BATCH_SIZE = 8;
+/** Quick RPC fallback when Monadscan/Atlas are unavailable (~15 min of blocks). */
+const MAX_BLOCKS_TO_SCAN = 3_000;
+const RPC_BATCH_SIZE = 20;
 const BATCH_DELAY_MS = 400;
-const RPC_TIMEOUT_MS = 90_000;
+const RPC_TIMEOUT_MS = 18_000;
 
 const RPC_URL = "https://testnet-rpc.monad.xyz/";
 
@@ -109,7 +109,7 @@ function extractTransfersFromBlock(block: RpcBlock, normalized: string): RawTran
   return transfers;
 }
 
-async function scanBlockRangeBackward(
+async function scanBlockRangeForward(
   startBlock: bigint,
   endBlock: bigint,
   normalized: string,
@@ -117,10 +117,10 @@ async function scanBlockRangeBackward(
   const transfers: RawTransfer[] = [];
   const seen = new Set<string>();
 
-  for (let bn = endBlock; bn >= startBlock; bn -= BigInt(RPC_BATCH_SIZE)) {
+  for (let bn = startBlock; bn <= endBlock; bn += BigInt(RPC_BATCH_SIZE)) {
     const batch: bigint[] = [];
-    for (let offset = 0; offset < RPC_BATCH_SIZE && bn - BigInt(offset) >= startBlock; offset++) {
-      batch.push(bn - BigInt(offset));
+    for (let offset = 0; offset < RPC_BATCH_SIZE && bn + BigInt(offset) <= endBlock; offset++) {
+      batch.push(bn + BigInt(offset));
     }
 
     const calls = batch.map((blockNumber) => ({
@@ -159,7 +159,7 @@ async function fetchTransfersFromRpcInternal(
   const startBlock =
     latest > BigInt(MAX_BLOCKS_TO_SCAN) ? latest - BigInt(MAX_BLOCKS_TO_SCAN) : BigInt(0);
 
-  const transfers = await scanBlockRangeBackward(startBlock, latest, normalized);
+  const transfers = await scanBlockRangeForward(startBlock, latest, normalized);
   transfers.sort((a, b) => a.timestamp - b.timestamp);
 
   return { transfers, source: "monad-rpc" };

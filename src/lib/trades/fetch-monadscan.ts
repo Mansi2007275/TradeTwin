@@ -34,8 +34,6 @@ function mapTx(tx: MonadscanTx, normalized: string): RawTransfer | null {
   if (!tx.hash || tx.isError === "1") return null;
 
   const valueWei = BigInt(tx.value ?? "0");
-  if (valueWei === BigInt(0)) return null;
-
   const from = tx.from?.toLowerCase();
   const to = tx.to?.toLowerCase();
   if (!from || !to) return null;
@@ -44,12 +42,14 @@ function mapTx(tx: MonadscanTx, normalized: string): RawTransfer | null {
   const timestamp = Number(tx.timeStamp);
   if (!Number.isFinite(timestamp) || timestamp <= 0) return null;
 
+  const amount = valueWei > BigInt(0) ? Number(valueWei) / 1e18 : 0.001;
+
   return {
     transactionHash: tx.hash,
     token: "MON",
     tokenSymbol: "MON",
-    direction: to === normalized ? "in" : "out",
-    amount: Number(valueWei) / 1e18,
+    direction: to === normalized && from !== normalized ? "in" : "out",
+    amount,
     timestamp: timestamp * 1000,
     gasUsed: Number(tx.gasUsed ?? 0),
     blockNumber: Number(tx.blockNumber ?? 0),
