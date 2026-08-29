@@ -123,7 +123,11 @@ async function loadOrFetchPriceData(forceRefresh = false): Promise<PriceDataResu
 
   try {
     const fresh = await fetchFromCoinGecko();
-    await writeCacheFile(fresh);
+    try {
+      await writeCacheFile(fresh);
+    } catch (writeError) {
+      console.warn("[priceDataService] Cache write skipped (read-only FS):", writeError);
+    }
     return { cache: fresh, fromCache: false };
   } catch (error) {
     console.warn("[priceDataService] CoinGecko fetch failed:", error);
