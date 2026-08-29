@@ -61,6 +61,14 @@ export default function SimulationPage() {
     }
   }, [twin, session, marketsReady, startSimulation]);
 
+  const whyDiffered = useMemo(() => {
+    if (!session || !lastRecord || !twin || !dna || !lastRecord.divergence.diverged) {
+      return null;
+    }
+    const brokeCount = session.completedRounds.filter((r) => r.divergence.diverged).length;
+    return buildWhyWeDiffered(lastRecord, twin, dna, brokeCount);
+  }, [session, lastRecord, twin, dna]);
+
   if (!hydrated || !marketsReady) {
     return (
       <AuthGuard>
@@ -158,12 +166,6 @@ export default function SimulationPage() {
     ? session.completedRounds.length
     : playingRoundIndex + 1;
 
-  const whyDiffered = useMemo(() => {
-    if (!lastRecord || !twin || !dna || !lastRecord.divergence.diverged) return null;
-    const brokeCount = session.completedRounds.filter((r) => r.divergence.diverged).length;
-    return buildWhyWeDiffered(lastRecord, twin, dna, brokeCount);
-  }, [lastRecord, twin, dna, session.completedRounds]);
-
   return (
     <AuthGuard>
       <PageContainer
@@ -173,15 +175,14 @@ export default function SimulationPage() {
         <div className="space-y-6">
           <NetworkSwitchPrompt />
 
-          {twin.lowDataMode && (
+          {twin.lowDataMode !== false && (twin.lowDataMode || twin.tradeCount < 3) && (
             <MotionItem>
               <Card variant="ghost" padding="md" hover={false}>
                 <p className="text-sm text-[var(--warning)]">
-                  Limited on-chain history ({twin.tradeCount} transfers). Your Twin uses neutral
-                  baselines — add{" "}
-                  <code className="text-xs">MONADSCAN_API_KEY</code> to{" "}
-                  <code className="text-xs">.env</code>, re-analyze on Dashboard, then restart
-                  simulation for behaviour matched to your real trades.
+                  Limited on-chain history ({twin.tradeCount} transfers). Add{" "}
+                  <code className="text-xs">MONADSCAN_API_KEY</code> in your environment (Vercel
+                  Settings → Environment Variables or local <code className="text-xs">.env</code>
+                  ), re-analyze on Dashboard, then restart simulation.
                 </p>
               </Card>
             </MotionItem>

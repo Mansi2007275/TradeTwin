@@ -9,6 +9,8 @@ interface LogoProps {
   showWordmark?: boolean;
   className?: string;
   animated?: boolean;
+  /** Light wordmark styling for dark backgrounds (sidebar only). */
+  variant?: "default" | "onDark";
 }
 
 const sizeMap = {
@@ -23,13 +25,14 @@ export function Logo({
   showWordmark = true,
   className,
   animated = false,
+  variant = "default",
 }: LogoProps) {
   const { box, icon, text } = sizeMap[size];
 
   const mark = (
     <div
       className={cn(
-        "flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-subtle)] bg-white shadow-sm",
+        "logo-mark flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-subtle)] bg-white shadow-sm",
         box,
       )}
     >
@@ -45,7 +48,13 @@ export function Logo({
   );
 
   return (
-    <div className={cn("flex items-center gap-3", className)}>
+    <div
+      className={cn(
+        "flex items-center gap-3",
+        variant === "onDark" && "logo--on-dark",
+        className,
+      )}
+    >
       {animated ? (
         <motion.div
           initial={{ scale: 0.85, opacity: 0, rotate: -8 }}
@@ -58,8 +67,15 @@ export function Logo({
         mark
       )}
       {showWordmark && (
-        <span className={cn("type-display !normal-case", text)}>
-          Trade<span className="text-[var(--accent)]">Twin</span>
+        <span className={cn("logo-wordmark type-display !normal-case", text)}>
+          Trade
+          <span
+            className={cn(
+              variant === "onDark" ? "logo-wordmark-accent" : "text-[var(--accent)]",
+            )}
+          >
+            Twin
+          </span>
         </span>
       )}
     </div>

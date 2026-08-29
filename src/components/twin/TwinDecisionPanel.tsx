@@ -61,10 +61,10 @@ export function TwinDecisionPanel({ result }: { result: TwinDecisionResult }) {
           </span>
           <Badge variant="default">{result.decision}</Badge>
           <Badge variant="info">
-            {Math.round(result.decisionStrength * 100)}% decision strength
+            {Math.round((result.decisionStrength ?? result.confidence) * 100)}% decision strength
           </Badge>
           <Badge variant="warning">
-            {Math.round(result.dataConfidence * 100)}% data confidence
+            {Math.round((result.dataConfidence ?? 0.1) * 100)}% data confidence
           </Badge>
         </div>
 

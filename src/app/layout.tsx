@@ -20,6 +20,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://trade-twin.vercel.app",
+  ),
   title: "TradeTwin — Beat Your Trading Self",
   description:
     "AI behavioural model of your crypto trading history. Compete against your Trading Twin in risk-free simulations.",

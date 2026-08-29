@@ -17,10 +17,10 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="app-sidebar fixed inset-y-0 left-0 z-40 flex w-[240px] flex-col border-r border-[var(--border-subtle)] bg-white">
-      <div className="border-b border-[var(--border-subtle)] px-5 py-5">
+    <aside className="app-sidebar fixed inset-y-0 left-0 z-40 flex w-[240px] flex-col border-r">
+      <div className="border-b border-[var(--sidebar-border)] px-5 py-5">
         <Link href="/dashboard">
-          <Logo size="sm" />
+          <Logo size="sm" variant="onDark" />
         </Link>
       </div>
 
@@ -31,10 +31,8 @@ export function Sidebar() {
             <Link key={item.href} href={item.href}>
               <span
                 className={cn(
-                  "block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                  active
-                    ? "bg-[var(--surface-muted)] text-[var(--text-display)]"
-                    : "text-[var(--text-muted)] hover:bg-[var(--surface-inset)] hover:text-[var(--text-heading)]",
+                  "sidebar-nav-link",
+                  active && "sidebar-nav-link--active",
                 )}
               >
                 {item.label}
@@ -44,9 +42,9 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="border-t border-[var(--border-subtle)] px-5 py-4">
-        <p className="type-eyebrow">Network</p>
-        <p className="font-data mt-1 text-xs text-[var(--text-muted)]">Monad · 10143</p>
+      <div className="border-t border-[var(--sidebar-border)] px-5 py-4">
+        <p className="sidebar-eyebrow type-eyebrow">Network</p>
+        <p className="sidebar-footer-text font-data mt-1 text-xs">Monad · 10143</p>
       </div>
     </aside>
   );
